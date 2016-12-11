@@ -4,33 +4,94 @@ var SecurityObscurity = function(){
 	this.example2 = "a-b-c-d-e-f-g-h-987[abcde]";
 	this.example3 = "not-a-real-room-404[oarel]";
 	this.example4 = "totally-real-room-200[decoy]";
+	this.example5 = "qzmt-zixmtkozy-ivhz-343";
 	this.numberRegex = new RegExp("[0-9]+");
 
 	this.run = function(){
 		var that = this;
+		this.testWithExamples();
+		$.get(that.puzzleInput, function(data){
+			that.runAll(data.split('\n'));
+		});
+	};
+
+	this.testWithExamples = function(){
         // this.isRealRoom(this.example1);
         // this.isRealRoom(this.example2);
         // this.isRealRoom(this.example3);
         // this.isRealRoom(this.example4);
-		$.get(that.puzzleInput, function(data){
-			that.countValidSectorIds(data.split('\n'));
-		});
-        //
-		// $.get(that.puzzleInput, function(data){
-		// 	that.part2(data.split('\n'));
-		// });
+
+        // var letterGroups = this.example5.split(this.numberRegex);
+        // var roomName = letterGroups[0].replace(/-/g, '');
+        // var shiftSpaces = parseInt(this.example5.match(this.numberRegex)[0]) % 26;
+        // console.log(roomName);
+        // console.log(shiftSpaces);
+        // var shiftedName = this.shiftCipher(roomName, shiftSpaces);
+        // console.log(shiftedName);
 	};
 
-	this.countValidSectorIds = function(roomInput){
-		var sectorIdSum = 0;
-		for(var i = 0; i < roomInput.length; i++){
-			if(this.isRealRoom(roomInput[i])){
-                var sectorId = parseInt(roomInput[i].match(this.numberRegex)[0]);
-				sectorIdSum += sectorId;
+	this.runAll = function(roomInput){
+		var validLines = this.validSectors(roomInput);
+
+        this.countValidSectorIds(validLines);
+        var roomData = this.processShiftCipherOnLines(validLines);
+
+        console.log(roomData);
+
+        for(var i = 0; i < roomData.length; i++){
+        	if(roomData[i].roomName.indexOf("northpole") !== -1){
+        		console.log(roomData[i]);
 			}
+		}
+    };
+
+	this.processShiftCipherOnLines = function(validLines){
+		var roomData = [];
+        for(var i = 0; i < validLines.length; i++){
+            var letterGroups = validLines[i].split(this.numberRegex);
+            var encryptedRoomName = letterGroups[0].replace(/-/g, '');
+            var sectorId = parseInt(validLines[i].match(this.numberRegex)[0]);
+            var shiftSpaces = parseInt(sectorId) % 26;
+			var actualRoomName = this.shiftCipher(encryptedRoomName, shiftSpaces);
+            roomData.push(new RoomData(actualRoomName, sectorId));
+        }
+
+        return roomData;
+	};
+
+	this.shiftCipher = function(encryptedString, shiftSpaces){
+		var shiftedString = "";
+        //Characters from a-z (97-122)
+        for(var i = 0; i < encryptedString.length; i++){
+            var currentCharCode = encryptedString.charCodeAt(i) + shiftSpaces;
+            if(currentCharCode > 122){
+                currentCharCode = 96 + (currentCharCode - 122);
+            }
+            shiftedString += String.fromCharCode(currentCharCode);
+        }
+        return shiftedString;
+	}
+
+	this.countValidSectorIds = function(validLines){
+        var sectorIdSum = 0;
+
+        for(var i = 0; i < validLines.length; i++){
+            var sectorId = parseInt(validLines[i].match(this.numberRegex)[0]);
+            sectorIdSum += sectorId;
         }
 
         console.log("Valid sector ID sums: " + sectorIdSum);
+	};
+
+	this.validSectors = function(roomInput){
+		var validLines = [];
+		for(var i = 0; i < roomInput.length; i++){
+			if(this.isRealRoom(roomInput[i])){
+                validLines.push(roomInput[i]);
+			}
+        }
+
+		return validLines;
 	};
 
 	this.isRealRoom = function(line){
@@ -115,4 +176,9 @@ var LetterCount = function(letter, count){
         }
         return 0;
     };
+};
+
+var RoomData = function(roomName, sectorId){
+	this.roomName = roomName;
+	this.sectorId = sectorId;
 };
