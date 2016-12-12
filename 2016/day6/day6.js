@@ -10,14 +10,16 @@ var Day6 = function(){
     this.testWithExamples = function(){
         var that = this;
         $.get(that.fullExample1, function(data){
-            that.part1(data.split('\n'));
+            // that.part1(data.split('\n'));
+            that.part2(data.split('\n'));
         });
     };
 
-    this.runAll = function(roomInput){
+    this.runAll = function(){
         var that = this;
         $.get(that.puzzleInput, function(data){
-            that.part1(data.split('\n'));
+            // that.part1(data.split('\n'));
+            that.part2(data.split('\n'));
         });
     };
 
@@ -29,6 +31,18 @@ var Day6 = function(){
         var errorCorrectedMessage = '';
         for(var i = 0; i < mostCommonCharacters.length; i++){
             errorCorrectedMessage += mostCommonCharacters[i].character;
+        }
+        console.log(errorCorrectedMessage);
+    };
+
+    this.part2 = function(lines){
+        var characterIndexCounts = this.countCharacters(lines);
+        console.log(characterIndexCounts);
+        var leastCommonCharacters = this.findLeastCommonCharacters(characterIndexCounts);
+        console.log(leastCommonCharacters);
+        var errorCorrectedMessage = '';
+        for(var i = 0; i < leastCommonCharacters.length; i++){
+            errorCorrectedMessage += leastCommonCharacters[i].character;
         }
         console.log(errorCorrectedMessage);
     };
@@ -75,6 +89,28 @@ var Day6 = function(){
         }
 
         return mostCommonCharacters;
+    };
+
+    this.findLeastCommonCharacters = function(characterIndexCountArray){
+        var leastCommonCharacters = [];
+        for(var i = 0; i < characterIndexCountArray.length; i++){
+            var keyIter = characterIndexCountArray[i].characterCounts.keys();
+            var firstKeyValue = keyIter.next().value;
+            leastCommonCharacters.push(new CharacterCount(firstKeyValue,
+                characterIndexCountArray[i].characterCounts.get(firstKeyValue)));
+
+            var currentItem = keyIter.next();
+            while(currentItem.done === false) {
+                var currentCount = characterIndexCountArray[i].characterCounts.get(currentItem.value);
+                if(leastCommonCharacters[i].count > currentCount){
+                    leastCommonCharacters[i].character = currentItem.value;
+                    leastCommonCharacters[i].count = currentCount;
+                }
+                currentItem = keyIter.next();
+            }
+        }
+
+        return leastCommonCharacters;
     };
 };
 
