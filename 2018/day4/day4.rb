@@ -18,11 +18,11 @@ class GuardShift
   def total_minutes_asleep
     minutes_asleep = 0
     @asleep_times.each_with_index do |time, i|
-      minutes_asleep = @awake_times[i] - @asleep_times[i]
+      minutes_asleep += @awake_times[i] - @asleep_times[i]
     end
     minutes_asleep
   end
-@awake_times=[8, 43], @asleep_times=[7, 15],
+
   def asleep_at?(minute)
     @asleep_times.each_with_index do |time, i|
       return true if @asleep_times[i] == minute
@@ -46,12 +46,16 @@ class Guard
   @id
   @guard_shifts
   @total_minutes_asleep
+  @most_asleep_minute
+  @most_asleep_minute_count
 
-  attr_accessor :id, :guard_shifts, :total_minutes_asleep
+  attr_accessor :id, :guard_shifts, :total_minutes_asleep, :most_asleep_minute, :most_asleep_minute_count
 
   def initialize
     @guard_shifts = []
     @total_minutes_asleep = 0
+    @most_asleep_minute = -1
+    @most_asleep_minute_count = -1
   end
 
   # It's assumed the shift is for an hour, 00-59
@@ -64,7 +68,19 @@ class Guard
     @total_minutes_asleep
   end
 
+  def most_asleep_minute_count
+    return @most_asleep_minute_count if @most_asleep_minute_count > -1
+    calculate_most_asleep_minute_statistics
+    @most_asleep_minute_count
+  end
+
   def most_asleep_minute
+    return @most_asleep_minute if @most_asleep_minute > -1
+    calculate_most_asleep_minute_statistics
+    @most_asleep_minute
+  end
+
+  def calculate_most_asleep_minute_statistics
     all_asleep_minutes = []
     all_awake_minutes = []
     @guard_shifts.each do |shift|
@@ -98,12 +114,12 @@ class Guard
         max_count_minute = minute
       end
     end
-
-    max_count_minute
+    @most_asleep_minute_count = max_count
+    @most_asleep_minute = max_count_minute
   end
 
   def to_s
-    "{Guard: id=#{@id}, guard_shifts=#{@guard_shifts}, total_minutes_asleep=#{@total_minutes_asleep}}"
+    "{Guard: id=#{@id}, guard_shifts=#{@guard_shifts}, total_minutes_asleep=#{@total_minutes_asleep}, most_asleep_minute=#{@most_asleep_minute}, most_asleep_minute_count=#{@most_asleep_minute_count}}"
   end
 end
 
@@ -153,17 +169,28 @@ end
 
 max_asleep_minutes = 0
 max_asleep_guard = nil
+max_asleep_same_minute = 0
+max_asleep_same_minute_guard = nil
 
 guards.each do |id, guard|
   asleep_time = guard.total_minutes_asleep
+  asleep_same_minute_count = guard.most_asleep_minute_count
 
   if max_asleep_minutes < asleep_time
     max_asleep_minutes = asleep_time
     max_asleep_guard = guard
   end
+
+  if max_asleep_same_minute < asleep_same_minute_count
+    max_asleep_same_minute = asleep_same_minute_count
+    max_asleep_same_minute_guard = guard
+  end
 end
 
-puts max_asleep_guard
+puts max_asleep_guard.id
 puts max_asleep_guard.most_asleep_minute
-puts guards
-# puts max_asleep_guard.most_asleep_minute * max_asleep_guard.id
+puts max_asleep_guard.id * max_asleep_guard.most_asleep_minute
+
+puts max_asleep_same_minute_guard.id
+puts max_asleep_same_minute
+puts max_asleep_same_minute_guard.id * max_asleep_same_minute_guard.most_asleep_minute
