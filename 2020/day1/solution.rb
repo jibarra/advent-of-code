@@ -16,4 +16,27 @@ end
 
 puts numbers_with_matches
 puts numbers_with_matches.inject(:*)
-  
+
+numbers_with_matches = numbers.select do |num|
+  other_summed_number = summed_number - num
+  second_number_to_add = nil
+  third_number_to_add = nil
+  numbers.each do |m|
+    # Assuming numbers only appear once
+    next if m == num
+
+    numbers.each do |n|
+      # Assuming numbers only appear once
+      next if n == m || n == num
+
+      if m + n == other_summed_number
+        second_number_to_add = m
+        third_number_to_add = n
+      end
+    end
+  end
+  second_number_to_add && third_number_to_add
+end
+
+puts numbers_with_matches
+puts numbers_with_matches.inject(:*)
