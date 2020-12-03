@@ -23,5 +23,17 @@ def trees_encountered(tree_coordinates, add_x, add_y)
   tree_count
 end
 
-tree_count = trees_encountered(tree_coordinates, 3, 1)
-puts tree_count
+tree_count_right_1_down_1 = trees_encountered(tree_coordinates, 1, 1)
+tree_count_right_3_down_1 = trees_encountered(tree_coordinates, 3, 1)
+tree_count_right_5_down_1 = trees_encountered(tree_coordinates, 5, 1)
+tree_count_right_7_down_1 = trees_encountered(tree_coordinates, 7, 1)
+tree_count_right_1_down_2 = trees_encountered(tree_coordinates, 1, 2)
+
+
+puts (
+  tree_count_right_1_down_1 *
+  tree_count_right_3_down_1 *
+  tree_count_right_5_down_1 *
+  tree_count_right_7_down_1 *
+  tree_count_right_1_down_2
+)
