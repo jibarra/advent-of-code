@@ -82,3 +82,73 @@ lines.each do |round|
 end
 
 puts total_score
+
+# Part 2
+LOSE_INPUT = 'X'
+DRAW_INPUT = 'Y'
+WIN_INPUT = 'Z'
+
+def result_to_self_choice(opponent_choice, desired_result)
+  if opponent_choice == OPPONENT_ROCK
+    case desired_result
+    when LOSE_INPUT
+      return SELF_SCISSORS
+    when DRAW_INPUT
+      return SELF_ROCK
+    when WIN_INPUT
+      return SELF_PAPER
+    end
+  elsif opponent_choice == OPPONENT_PAPER
+    case desired_result
+    when LOSE_INPUT
+      return SELF_ROCK
+    when DRAW_INPUT
+      return SELF_PAPER
+    when WIN_INPUT
+      return SELF_SCISSORS
+    end
+  elsif opponent_choice == OPPONENT_SCISSORS
+    case desired_result
+    when LOSE_INPUT
+      return SELF_PAPER
+    when DRAW_INPUT
+      return SELF_SCISSORS
+    when WIN_INPUT
+      return SELF_ROCK
+    end
+  else
+    puts 'bad input'
+  end
+end
+
+total_score = 0
+lines.each do |round|
+  choices = round.split(' ')
+  opponent_choice = choices[0]
+  desired_result = choices[1]
+
+  round_score = 0
+  case desired_result
+  when LOSE_INPUT
+    round_score = LOSE_SCORE
+  when DRAW_INPUT
+    round_score = DRAW_SCORE
+  when WIN_INPUT
+    round_score = WIN_SCORE
+  end
+
+  self_choice = result_to_self_choice(opponent_choice, desired_result)
+
+  case self_choice
+  when SELF_ROCK
+    round_score += CHOOSE_ROCK_SCORE
+  when SELF_PAPER
+    round_score += CHOOSE_PAPER_SCORE
+  when SELF_SCISSORS
+    round_score += CHOOSE_SCISSORS_SCORE
+  end
+  
+  total_score += round_score
+end
+
+puts total_score
