@@ -18,6 +18,7 @@ end
   end
 end
 
+part_2_stacks = stacks.map { |stack| stack.dup }
 
 instructions = lines[separating_line + 1..-1].map(&:strip)
 
@@ -41,4 +42,23 @@ stacks.each do |stack|
 end
 
 # Part 1
-top_of_stack
+pp top_of_stack
+
+# Part 2
+instructions.each do |instruction|
+  stack_instructions = instruction.scan(/\d+/).map(&:to_i)
+  quantity_to_move = stack_instructions[0]
+  stack_to_move_from = part_2_stacks[stack_instructions[1] - 1]
+  stack_to_move_to = part_2_stacks[stack_instructions[2] - 1]
+
+  items_to_move = stack_to_move_from.pop(quantity_to_move).compact
+  stack_to_move_to.push(*items_to_move)
+end
+
+
+top_of_stack = ''
+part_2_stacks.each do |stack|
+  top_of_stack = top_of_stack + (stack.last || '')
+end
+
+pp top_of_stack
