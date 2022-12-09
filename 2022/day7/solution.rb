@@ -115,9 +115,11 @@ end
 # Part 1
 root.compute_size
 directories_at_most_100000 = []
+all_directories = []
 directories = [root]
 while(directories.size > 0)
   current_directory = directories.pop
+  all_directories.push(current_directory)
   if current_directory.computed_size <= 100_000
     directories_at_most_100000.push(current_directory)
   end
@@ -130,3 +132,19 @@ while(directories.size > 0)
 end
 
 pp directories_at_most_100000.sum { |directory| directory.computed_size }
+
+# Part 2
+TOTAL_DISK_SPACE = 70_000_000
+NEEDED_DISK_SPACE = 30_000_000
+current_disk_space = root.computed_size
+current_empty_space = TOTAL_DISK_SPACE - root.computed_size
+target_space_to_delete = NEEDED_DISK_SPACE - current_empty_space
+
+directories_at_or_above_target = all_directories.select { |directory| directory.computed_size >= target_space_to_delete }
+minimum = all_directories.first
+directories_at_or_above_target.each do |directory|
+  if directory.computed_size < minimum.computed_size
+    minimum = directory
+  end
+end
+pp minimum.computed_size
