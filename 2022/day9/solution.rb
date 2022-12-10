@@ -67,3 +67,39 @@ lines.each do |line|
 end
 
 pp tail_visited_coordinates.size
+
+knot_coordinates = (1..10).map do |_|
+  { x: 0, y: 0 }
+end
+
+final_tail_visited_coordinates = Set.new
+final_tail_visited_coordinates.add({ x: 0, y: 0 })
+
+lines.each do |line|
+  direction, spaces = line.split(' ')
+  spaces = spaces.to_i
+
+  (0..spaces - 1).each do |_|
+    case direction
+    when 'R'
+      knot_coordinates[0] = { x: knot_coordinates.first[:x] + 1, y: knot_coordinates.first[:y] }
+    when 'L'
+      knot_coordinates[0] = { x: knot_coordinates.first[:x] - 1, y: knot_coordinates.first[:y] }
+    when 'U'
+      knot_coordinates[0] = { x: knot_coordinates.first[:x], y: knot_coordinates.first[:y] + 1 }
+    when 'D'
+      knot_coordinates[0] = { x: knot_coordinates.first[:x], y: knot_coordinates.first[:y] - 1 }
+    else
+      raise ArgumentError, "Unexpected direction: #{direction}"
+    end
+
+    knot_coordinates.each_with_index do |head_knot, index|
+      next if index == knot_coordinates.size - 1
+      knot_coordinates[index + 1] = move_tail_to_head_if_necessary(head_knot, knot_coordinates[index + 1])
+    end
+
+    final_tail_visited_coordinates.add(knot_coordinates[knot_coordinates.size - 1])
+  end
+end
+
+puts final_tail_visited_coordinates.size
