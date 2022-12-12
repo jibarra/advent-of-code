@@ -67,6 +67,34 @@ class Operation
   end
 end
 
+def build_monkeys(input_lines)
+  monkeys = []
+
+  input_lines.each_slice(7) do |tuple|
+    monkey_number = tuple[0].scan(/\d+/).first
+    starting_items = tuple[1].scan(/\d+/).map(&:to_i)
+    first_operand, operator, second_operand = convert_operation(tuple[2].sub('Operation: ', ''))
+
+    # currentely just a divisible check
+    test = tuple[3].scan(/\d+/).first.to_i
+    if_true_throw = tuple[4].scan(/\d+/).first.to_i
+    if_false_throw = tuple[5].scan(/\d+/).first.to_i
+
+    operation = Operation.new(first_operand, operator, second_operand)
+    monkey = Monkey.new(
+      monkey_number,
+      starting_items,
+      operation,
+      test,
+      if_true_throw,
+      if_false_throw
+    )
+    monkeys.push(monkey)
+  end
+
+  monkeys
+end
+
 def convert_operation(operation_string)
   operation_string_split = operation_string.split(' ')
   first_operand = operation_string_split[2]
@@ -76,29 +104,7 @@ def convert_operation(operation_string)
   [first_operand, operator, second_operand]
 end
 
-monkeys = []
-
-lines.each_slice(7) do |tuple|
-  monkey_number = tuple[0].scan(/\d+/).first
-  starting_items = tuple[1].scan(/\d+/).map(&:to_i)
-  first_operand, operator, second_operand = convert_operation(tuple[2].sub('Operation: ', ''))
-
-  # currentely just a divisible check
-  test = tuple[3].scan(/\d+/).first.to_i
-  if_true_throw = tuple[4].scan(/\d+/).first.to_i
-  if_false_throw = tuple[5].scan(/\d+/).first.to_i
-
-  operation = Operation.new(first_operand, operator, second_operand)
-  monkey = Monkey.new(
-    monkey_number,
-    starting_items,
-    operation,
-    test,
-    if_true_throw,
-    if_false_throw
-  )
-  monkeys.push(monkey)
-end
+monkeys = build_monkeys(lines)
 
 (1..20).each do |_|
   monkeys.each do |monkey|
@@ -110,6 +116,29 @@ end
       test_result = boredom_result % monkey.test == 0
       target_monkey_number = test_result ? monkey.if_true_throw : monkey.if_false_throw
       monkeys[target_monkey_number].items.push(boredom_result)
+      monkey.count_of_inspected_items += 1
+    end
+  end
+end
+
+counts = monkeys.map { |monkey| monkey.count_of_inspected_items }
+most_active_monkey_counts = counts.max(2)
+pp most_active_monkey_counts[0] * most_active_monkey_counts[1]
+
+monkeys = build_monkeys(lines)
+
+highest_divisor = monkeys.map(&:test).reduce(&:*)
+
+(1..10_000).each do |i|
+  monkeys.each do |monkey|
+    monkey_items_to_evaluate = monkey.items
+    monkey.items = []
+    monkey_items_to_evaluate.each do |item|
+      operation_result = monkey.operation.do_operation(item)
+      operation_result = operation_result % highest_divisor
+      test_result = operation_result % monkey.test == 0
+      target_monkey_number = test_result ? monkey.if_true_throw : monkey.if_false_throw
+      monkeys[target_monkey_number].items.push(operation_result)
       monkey.count_of_inspected_items += 1
     end
   end
