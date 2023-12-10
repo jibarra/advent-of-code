@@ -35,6 +35,25 @@ def part_1(parsed_lines)
     part_1_total
 end
 
+def part_2(parsed_lines)
+    card_matches = card_matches(parsed_lines)
+    scratchcards_to_count = parsed_lines.each_with_object({}) { |line, memo| memo[line[:card_number]] = 1 }
+
+    parsed_lines.each do |parsed_line|
+        card_number = parsed_line[:card_number]
+        number_of_cards_won = card_matches[card_number]
+        quantity_of_future_cards_to_add = scratchcards_to_count[card_number]
+
+        (0..(number_of_cards_won - 1)).each_with_index do |_, index|
+            won_card_number = card_number + index + 1
+            scratchcards_to_count[won_card_number] += quantity_of_future_cards_to_add
+        end
+    end
+
+    scratchcards_to_count.values.sum
+end
+
 parsed_lines = input_lines.map { |line| parse(line) }
 
 puts part_1(parsed_lines)
+puts part_2(parsed_lines)
