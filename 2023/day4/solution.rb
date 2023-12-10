@@ -13,20 +13,28 @@ def parse(line)
     }
 end
 
-def part_1(parsed_lines)
-    total_points = []
+def card_matches(parsed_lines)
+    card_matches = {}
     parsed_lines.each do |parsed_line|
         matched_numbers = parsed_line[:numbers_you_have].select do |number|
             parsed_line[:winning_numbers].include?(number)
         end
-        total = 0
-        matched_numbers.each { |_| total = total == 0 ? 1 : total * 2}
-        total_points << total
+        card_matches[parsed_line[:card_number]] = matched_numbers.size
     end
-    total_points.sum
+    card_matches
+end
+
+def part_1(parsed_lines)
+    part_1_total = 0
+    card_matches(parsed_lines).each do |card_number, matches|
+        total = 0
+        (1..matches).each { |_| total = total == 0 ? 1 : total * 2 }
+        part_1_total += total
+    end
+
+    part_1_total
 end
 
 parsed_lines = input_lines.map { |line| parse(line) }
-puts parsed_lines
 
 puts part_1(parsed_lines)
