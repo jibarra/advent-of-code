@@ -19,20 +19,29 @@ def build_map(map_name, input_lines)
         end
     end
 
-    sources_to_destinations = {}
+    sources_to_destination_ranges = []
     target_lines.each do |line|
         destination_start, source_start, range_length = line.split(' ').map(&:to_i)
-        (destination_start...destination_start + range_length).each_with_index do |destination, index|
-            sources_to_destinations[source_start + index] = destination
-        end
+        sources_to_destination_ranges << [
+            (source_start...source_start + range_length), 
+            (destination_start...destination_start + range_length),
+        ]
     end
 
-    sources_to_destinations
+    sources_to_destination_ranges
 end
 
-def convert(sources, sources_to_destinations)
+def convert(sources, sources_to_destination_ranges)
     sources.map do |source|
-        sources_to_destinations[source] || source
+        destination = nil
+        sources_to_destination_ranges.each do |source_range, destination_range|
+            if source_range.include?(source)
+                distance_into_range = source - source_range.begin
+                destination = destination_range.begin + distance_into_range
+            end
+        end
+
+        destination || source
     end
 end
 
