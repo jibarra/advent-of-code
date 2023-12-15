@@ -1,4 +1,4 @@
-def get_seeds(input_lines)
+def get_seeds_if_individual(input_lines)
     target_line = input_lines.find { |line| line.include?('seeds:')}
     seed_numbers = target_line.scan(/\d+/)
     seed_numbers.map(&:to_i)
@@ -65,7 +65,7 @@ def convert_seeds_to_location(seeds, input_lines)
 end
 
 def part_1(input_lines)
-    seeds = get_seeds(input_lines)
+    seeds = get_seeds_if_individual(input_lines)
     locations = convert_seeds_to_location(seeds, input_lines)
     locations.min
 end
