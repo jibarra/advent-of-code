@@ -45,8 +45,8 @@ def convert(sources, sources_to_destination_ranges)
     end
 end
 
-def part_1(input_lines)
-    sources_to_convert = get_seeds(input_lines)
+def convert_seeds_to_location(seeds, input_lines)
+    eventual_locations = seeds
 
     [
         'seed-to-soil',
@@ -58,10 +58,16 @@ def part_1(input_lines)
         'humidity-to-location',
     ].each do |map_name|
         sources_to_destinations = build_map(map_name, input_lines)
-        sources_to_convert = convert(sources_to_convert, sources_to_destinations)
+        eventual_locations = convert(eventual_locations, sources_to_destinations)
     end
 
-    sources_to_convert.min
+    eventual_locations
+end
+
+def part_1(input_lines)
+    seeds = get_seeds(input_lines)
+    locations = convert_seeds_to_location(seeds, input_lines)
+    locations.min
 end
 
 input_lines = File.readlines('./input.txt').each(&:strip!)
