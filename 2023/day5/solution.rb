@@ -4,6 +4,14 @@ def get_seeds_if_individual(input_lines)
     seed_numbers.map(&:to_i)
 end
 
+def get_seeds_if_ranges(input_lines)
+    target_line = input_lines.find { |line| line.include?('seeds:')}
+    seed_numbers = target_line.scan(/\d+/).map(&:to_i)
+    seed_numbers.each_slice(2).flat_map do |seed_start, seed_range|
+        (seed_start...seed_start + seed_range).to_a
+    end
+end
+
 def build_map(map_name, input_lines)
     map_header_found = false
 
@@ -70,5 +78,12 @@ def part_1(input_lines)
     locations.min
 end
 
+def part_2(input_lines)
+    seeds = get_seeds_if_ranges(input_lines)
+    locations = convert_seeds_to_location(seeds, input_lines)
+    locations.min
+end
+
 input_lines = File.readlines('./input.txt').each(&:strip!)
 pp part_1(input_lines)
+pp part_2(input_lines)
