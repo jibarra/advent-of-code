@@ -48,26 +48,18 @@ end
 def part_1(input_lines)
     sources_to_convert = get_seeds(input_lines)
 
-    seed_to_soil = build_map('seed-to-soil', input_lines)
-    sources_to_convert = convert(sources_to_convert, seed_to_soil)
-
-    soil_to_fertilizer = build_map('soil-to-fertilizer', input_lines)
-    sources_to_convert = convert(sources_to_convert, soil_to_fertilizer)
-
-    fertilizer_to_water = build_map('fertilizer-to-water', input_lines)
-    sources_to_convert = convert(sources_to_convert, fertilizer_to_water)
-
-    water_to_light = build_map('water-to-light', input_lines)
-    sources_to_convert = convert(sources_to_convert, water_to_light)
-
-    light_to_temperature = build_map('light-to-temperature', input_lines)
-    sources_to_convert = convert(sources_to_convert, light_to_temperature)
-
-    temperature_to_humidity = build_map('temperature-to-humidity', input_lines)
-    sources_to_convert = convert(sources_to_convert, temperature_to_humidity)
-
-    humidity_to_location = build_map('humidity-to-location', input_lines)
-    sources_to_convert = convert(sources_to_convert, humidity_to_location)
+    [
+        'seed-to-soil',
+        'soil-to-fertilizer',
+        'fertilizer-to-water',
+        'water-to-light',
+        'light-to-temperature',
+        'temperature-to-humidity',
+        'humidity-to-location',
+    ].each do |map_name|
+        sources_to_destinations = build_map(map_name, input_lines)
+        sources_to_convert = convert(sources_to_convert, sources_to_destinations)
+    end
 
     sources_to_convert.min
 end
