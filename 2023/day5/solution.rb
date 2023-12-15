@@ -1,14 +1,26 @@
+require 'set'
+
+MAP_NAMES = [
+    'seed-to-soil',
+    'soil-to-fertilizer',
+    'fertilizer-to-water',
+    'water-to-light',
+    'light-to-temperature',
+    'temperature-to-humidity',
+    'humidity-to-location',
+]
+
 def get_seeds_if_individual(input_lines)
     target_line = input_lines.find { |line| line.include?('seeds:')}
     seed_numbers = target_line.scan(/\d+/)
     seed_numbers.map(&:to_i)
 end
 
-def get_seeds_if_ranges(input_lines)
+def get_seed_ranges(input_lines)
     target_line = input_lines.find { |line| line.include?('seeds:')}
     seed_numbers = target_line.scan(/\d+/).map(&:to_i)
-    seed_numbers.each_slice(2).flat_map do |seed_start, seed_range|
-        (seed_start...seed_start + seed_range).to_a
+    seed_numbers.each_slice(2).map do |seed_start, seed_range|
+        (seed_start...seed_start + seed_range)
     end
 end
 
@@ -56,15 +68,7 @@ end
 def convert_seeds_to_location(seeds, input_lines)
     eventual_locations = seeds
 
-    [
-        'seed-to-soil',
-        'soil-to-fertilizer',
-        'fertilizer-to-water',
-        'water-to-light',
-        'light-to-temperature',
-        'temperature-to-humidity',
-        'humidity-to-location',
-    ].each do |map_name|
+    MAP_NAMES.each do |map_name|
         sources_to_destinations = build_map(map_name, input_lines)
         eventual_locations = convert(eventual_locations, sources_to_destinations)
     end
@@ -79,9 +83,28 @@ def part_1(input_lines)
 end
 
 def part_2(input_lines)
-    seeds = get_seeds_if_ranges(input_lines)
-    locations = convert_seeds_to_location(seeds, input_lines)
-    locations.min
+    location = 0
+    seed_ranges = get_seed_ranges(input_lines)
+    lowest_found = false
+
+    maps = MAP_NAMES.reverse.map do |map_name|
+        build_map(map_name, input_lines).map { |source, destination| [destination, source] }
+    end
+
+    while !lowest_found
+        eventual_seed = [location]
+        pp eventual_seed
+        maps.each do |map|
+            eventual_seed = convert(eventual_seed, map)
+        end
+        if seed_ranges.any? { |seed_range| seed_range.include?(eventual_seed.first)}
+            lowest_found = true
+        else
+            location += 1
+        end
+    end
+
+    location
 end
 
 input_lines = File.readlines('./input.txt').each(&:strip!)
