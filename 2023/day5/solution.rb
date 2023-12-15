@@ -93,7 +93,6 @@ def part_2(input_lines)
 
     while !lowest_found
         eventual_seed = [location]
-        pp eventual_seed
         maps.each do |map|
             eventual_seed = convert(eventual_seed, map)
         end
